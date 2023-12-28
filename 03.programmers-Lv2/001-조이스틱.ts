@@ -1,32 +1,31 @@
 //https://school.programmers.co.kr/learn/courses/30/lessons/42860
 
-function solution(name: string) {
-    let answer = 0;
-    const min = 65;
-    const max = 90 + 1;
+function getCharDistance(str: string) {
+    const min = 'A'.charCodeAt(0);
+    const max = 'Z'.charCodeAt(0) + 1;
+    const code = str.charCodeAt(0);
+    return Math.min(code - min, max - code);
+}
 
-    const findChar = (find: string) => {
-        const findCode = find.charCodeAt(0);
-        return Math.min(findCode - min, max - findCode);
-    };
+export function solution(name: string) {
+    const distances = name.split('').map(getCharDistance);
+    const chageCount = distances.reduce((a, b) => a + b);
 
-    const chars = name.split('').map(findChar);
-    let minMove = chars.length - 1;
+    let minCursorCount = distances.length - 1;
 
-    for (const [i, char] of chars.entries()) {
-        answer += char;
-        let cursor = i + 1;
+    for (const charIdx of distances.keys()) {
+        let cursorCount = charIdx + 1;
 
-        while (cursor < chars.length && chars[cursor] === 0) cursor++;
+        while (cursorCount < distances.length && distances[cursorCount] === 0)
+            cursorCount++;
 
-        minMove = Math.min(
-            minMove, //정방향으로 전진
-            i * 2 + chars.length - cursor, //뒤로 돌아가기
-            i + 2 * (chars.length - cursor), //역방향
+        const rest = distances.length - cursorCount;
+        minCursorCount = Math.min(
+            minCursorCount, //정방향 이동
+            charIdx * 2 + rest, //현재 문자까지 이동 거리 + 그만큼 돌아가기 + A를 제외한 나머지 문자 길이
+            charIdx + 2 * rest, //A를 제외한 나머지 문자 길이로 역방향 이동 + 그만큼 돌아가기 + 현재 문자까지 이동 거리
         );
     }
 
-    return answer + minMove;
+    return chageCount + minCursorCount;
 }
-
-console.log(solution('BAABAA'));
